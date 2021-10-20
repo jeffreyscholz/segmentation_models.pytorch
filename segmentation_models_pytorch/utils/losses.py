@@ -42,6 +42,25 @@ class DiceLoss(base.Loss):
             ignore_channels=self.ignore_channels,
         )
 
+class FocalLoss(base.Loss):
+    def __init__(self, eps=1e-7, gamma=2., alpha=0.25, activation=None, ignore_channels=None, **kwargs):
+        super().__init__(**kwargs)
+        self.gamma = gamma
+        self.alpha = alpha
+        self.eps = eps
+        self.activation = Activation(activation)
+        self.ignore_channels = ignore_channels
+
+    def forward(self, y_pr, y_gt):
+        y_pr = self.activation(y_pr)
+        return F.focal_loss(
+            y_pr, y_gt,
+            gamma=self.gamma,
+            alpha=self.alpha,
+            eps=self.eps,
+            threshold=None,
+            ignore_channels=self.ignore_channels,
+        )
 
 class L1Loss(nn.L1Loss, base.Loss):
     pass
